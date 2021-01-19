@@ -1,7 +1,14 @@
 <template>
   <div id="app">
     <ul class="dice noselect">
-      <li @click.exact="countup(c.face)" @click.shift="countdown(c.face)" v-for="c in dice" :key="c.face" class="face">
+      <li 
+        v-for="c in dice" 
+        :key="c.face" 
+        @click.exact="countup(c.face)" 
+        @click.shift="countdown(c.face)" 
+        @dblclick="countdown(c.face)"
+        class="face"
+      >
         <div class="die" :class="diceclass(c.face)"></div>
         <div class="count">{{ c.count }}</div>
         <div class="percent" :class="percent_class(c.count)"> {{ percent(c.count) }}% </div>
