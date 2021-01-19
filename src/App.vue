@@ -200,7 +200,7 @@ div.percent.low {
   width: 50px; height: 50px;
   border-radius: 10px;
   position: relative;
-  margin: 10px;
+  margin: 0 10px 20px 10px;
   font-size: 6px;
   display: inline-block;
   box-shadow: 0px 5px 0 #CCC, 0 6px 3px #444, 0 10px 5px #999;
