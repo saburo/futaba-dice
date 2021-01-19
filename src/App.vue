@@ -74,13 +74,17 @@ export default {
       let pclass = 'normal';
       if (percent > threshold + 3) {
         // high: red
-        pclass = 'high'
+        pclass = 'high';
       } else if (percent < threshold - 3) {
         // low: red
-        pclass = 'low'
+        pclass = 'low';
+      } else if (percent > threshold + 1.5 ) {
+        pclass = 'mid';
+      } else if (percent < threshold - 1.5 ) {
+        pclass = 'mid';
       } else {
         // normal
-        pclass = 'normal'
+        pclass = 'normal';
       }
       return pclass
     },
@@ -161,14 +165,18 @@ div.percent.high {
   color: #f99;
 }
 
+div.percent.mid {
+  color: #fc9;
+}
+
 div.percent.low {
-  color: #99f;
+  color: #9af;
 }
 
 /* DICE */
 .die.one:after { 
   box-shadow: 0 .2em 0 #FFF;
-  background: #ff0000;
+  background: #fa5444;
 }
 
 .die.two:after { 
