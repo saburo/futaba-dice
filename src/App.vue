@@ -16,8 +16,8 @@
     </ul>
     <div class="others">
       <div class="total">Total: {{ total }}</div>
-
       <button class="reset-button" id="reset-button" @click="reset">RESET</button>
+      <button class="undo-button" id="undo-button" @click="undo_state = true" :class="class_undo_state">UNDO</button>
     </div>
   </div>
 </template>
@@ -36,11 +36,17 @@ export default {
         {face: 4, count: 0},
         {face: 5, count: 0},
         {face: 6, count: 0},
-      ]
+      ],
+      undo_state: false
     }
   },
   methods: {
     countup: function(face) {
+      if (this.undo_state) {
+        console.log('count down!!!')
+        this.countdown(face)
+        return
+      }
       let tmp = this.dice[face - 1]
       tmp.count += 1
       this.dice[face - 1] = tmp
@@ -51,15 +57,17 @@ export default {
       if (tmp.count < 0) {
         tmp.count = 0
       }
-      this.dice[face - 1] = tmp
+      this.dice[face - 1] = tmp;
+      this.undo_state = false;
     },
     reset: function() {
+      if (!confirm('Are you sure?')) return
       this.dice.map( (v) => {
         v.count = 0
       })
     },
     diceclass: function(face) {
-      const st = ['', 'one', 'two', 'three', 'four', 'five', 'six']
+      const st = ['', 'one', 'two', 'three', 'four', 'five', 'six'];
       return st[face]
     },
     percent: function(cnt) {
@@ -96,6 +104,12 @@ export default {
       const face = event.key / 1; // to int
       this.countup(face)
     },
+
+    undo_start: function() {
+      alert('undo_state')
+      let tmp = this.undo_state;
+      this.undo_state = !tmp;
+    },
   },
   computed: {
     total: function() {
@@ -105,6 +119,9 @@ export default {
       })
       return total_n
     },
+    class_undo_state: function() {
+      return this.undo_state ? 'active' : ''
+    }
   },
   created() {
     window.addEventListener("keydown", this.keybindings);
@@ -171,6 +188,12 @@ div.percent.mid {
 
 div.percent.low {
   color: #9af;
+}
+
+button.undo-button.active {
+  color: white;
+  border-color: white;
+  background-color: #f3f;
 }
 
 /* DICE */
