@@ -17,7 +17,7 @@
     <div class="others">
       <div class="total">Total: {{ total }}</div>
       <button class="reset-button" id="reset-button" @click="reset">RESET</button>
-      <button class="undo-button" id="undo-button" @click="undo_state = true" :class="class_undo_state">UNDO</button>
+      <button class="undo-button" id="undo-button" @click="undo_state = !undo_state" :class="class_undo_state">UNDO</button>
     </div>
   </div>
 </template>
@@ -103,12 +103,6 @@ export default {
 
       const face = event.key / 1; // to int
       this.countup(face)
-    },
-
-    undo_start: function() {
-      alert('undo_state')
-      let tmp = this.undo_state;
-      this.undo_state = !tmp;
     },
   },
   computed: {
