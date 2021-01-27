@@ -1,127 +1,144 @@
 <template>
   <div id="app">
     <ul class="dice noselect">
-      <li 
-        v-for="c in dice" 
-        :key="c.face" 
-        @click.exact="countup(c.face)" 
-        @click.shift="countdown(c.face)" 
+      <li
+        v-for="c in dice"
+        :key="c.face"
+        @click.exact.prevent="countup(c.face)"
+        @click.shift="countdown(c.face)"
         @dblclick="countdown(c.face)"
         class="face"
       >
         <div class="die" :class="diceclass(c.face)"></div>
         <div class="count">{{ c.count }}</div>
-        <div class="percent" :class="percent_class(c.count)"> {{ percent(c.count) }}% </div>
+        <div class="percent" :class="percent_class(c.count)">
+          {{ percent(c.count) }}%
+        </div>
       </li>
     </ul>
     <div class="others">
       <div class="total">Total: {{ total }}</div>
-      <button class="reset-button" id="reset-button" @click="reset">RESET</button>
-      <button class="undo-button" id="undo-button" @click="undo_state = !undo_state" :class="class_undo_state">UNDO</button>
+      <button class="reset-button" id="reset-button" @click="reset">
+        RESET
+      </button>
+      <button
+        class="undo-button"
+        id="undo-button"
+        @click="undo_state = !undo_state"
+        :class="class_undo_state"
+      >
+        UNDO
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+const myTrack = new Audio(require("@/assets/audio/tick.mp3"));
 
 export default {
-  name: 'App',
-  components: { },
-  data: function() {
+  name: "App",
+  components: {},
+  data: function () {
     return {
       dice: [
-        {face: 1, count: 0},
-        {face: 2, count: 0},
-        {face: 3, count: 0},
-        {face: 4, count: 0},
-        {face: 5, count: 0},
-        {face: 6, count: 0},
+        { face: 1, count: 0 },
+        { face: 2, count: 0 },
+        { face: 3, count: 0 },
+        { face: 4, count: 0 },
+        { face: 5, count: 0 },
+        { face: 6, count: 0 },
       ],
-      undo_state: false
-    }
+      undo_state: false,
+    };
   },
   methods: {
-    countup: function(face) {
+    countup: function (face) {
       if (this.undo_state) {
-        console.log('count down!!!')
-        this.countdown(face)
-        return
+        console.log("count down!!!");
+        this.countdown(face);
+        return;
       }
-      let tmp = this.dice[face - 1]
-      tmp.count += 1
-      this.dice[face - 1] = tmp
+      let tmp = this.dice[face - 1];
+      tmp.count += 1;
+      this.dice[face - 1] = tmp;
+      myTrack.play();
     },
-    countdown: function(face) {
-      let tmp = this.dice[face - 1]
-      tmp.count -= 1
+    countdown: function (face) {
+      let tmp = this.dice[face - 1];
+      tmp.count -= 1;
       if (tmp.count < 0) {
-        tmp.count = 0
+        tmp.count = 0;
       }
       this.dice[face - 1] = tmp;
       this.undo_state = false;
+      myTrack.play();
     },
-    reset: function() {
-      if (!confirm('Are you sure?')) return
-      this.dice.map( (v) => {
-        v.count = 0
-      })
+    reset: function () {
+      if (!confirm("Are you sure?")) return;
+      this.dice.map((v) => {
+        v.count = 0;
+      });
     },
-    diceclass: function(face) {
-      const st = ['', 'one', 'two', 'three', 'four', 'five', 'six'];
-      return st[face]
+    diceclass: function (face) {
+      const st = ["", "one", "two", "three", "four", "five", "six"];
+      return st[face];
     },
-    percent: function(cnt) {
+    percent: function (cnt) {
       if (cnt === 0) return 0;
-      return Math.round(1000 * cnt / this.total) / 10
+      return Math.round((1000 * cnt) / this.total) / 10;
     },
-    percent_class: function(cnt) {
+    percent_class: function (cnt) {
       if (this.total < 6) return;
 
       const threshold = 100 / 6;
       const percent = this.percent(cnt);
-      let pclass = 'normal';
+      let pclass = "normal";
       if (percent > threshold + 3) {
         // high: red
-        pclass = 'high';
+        pclass = "high";
       } else if (percent < threshold - 3) {
         // low: red
-        pclass = 'low';
-      } else if (percent > threshold + 1.5 ) {
-        pclass = 'mid';
-      } else if (percent < threshold - 1.5 ) {
-        pclass = 'mid';
+        pclass = "low";
+      } else if (percent > threshold + 1.5) {
+        pclass = "mid";
+      } else if (percent < threshold - 1.5) {
+        pclass = "mid";
       } else {
         // normal
-        pclass = 'normal';
+        pclass = "normal";
       }
-      return pclass
+      return pclass;
     },
 
-    keybindings: function(event) {
+    play_sound: function () {
+      myTrack.play();
+    },
+
+    keybindings: function (event) {
       const keylist = ["1", "2", "3", "4", "5", "6"];
-      if (keylist.indexOf(event.key) < 0) return
+      if (keylist.indexOf(event.key) < 0) return;
 
       const face = event.key / 1; // to int
-      this.countup(face)
+      this.countup(face);
     },
   },
   computed: {
-    total: function() {
-      var total_n = 0
+    total: function () {
+      var total_n = 0;
       this.dice.map((v) => {
-        total_n += v.count
-      })
-      return total_n
+        total_n += v.count;
+      });
+      return total_n;
     },
-    class_undo_state: function() {
-      return this.undo_state ? 'active' : ''
-    }
+    class_undo_state: function () {
+      return this.undo_state ? "active" : "";
+    },
   },
   created() {
     window.addEventListener("keydown", this.keybindings);
-  }
-
-}
+  },
+};
 </script>
 
 <style>
@@ -149,11 +166,10 @@ li.face {
   border: 1px solid #ccc;
   border-radius: 10px;
   background-color: #fff;
-
 }
 
 li.face:hover {
-  background-color: #f9f9f9; 
+  background-color: #f9f9f9;
 }
 
 li.face:active {
@@ -164,7 +180,7 @@ div.count {
   font-size: 3em;
   font-weight: bold;
   font-family: monospace;
-  color: #666
+  color: #666;
 }
 
 div.percent,
@@ -191,52 +207,62 @@ button.undo-button.active {
 }
 
 /* DICE */
-.die.one:after { 
-  box-shadow: 0 .2em 0 #FFF;
+.die.one:after {
+  box-shadow: 0 0.2em 0 #fff;
   background: #fa5444;
 }
 
-.die.two:after { 
+.die.two:after {
   background: transparent;
-  box-shadow: -2.3em -2.3em 0 #345, 2.3em  2.3em 0 #345, -2.3em -2.3em 0 #FFF, 2.3em  2.4em 0 #FFF;
+  box-shadow: -2.3em -2.3em 0 #345, 2.3em 2.3em 0 #345, -2.3em -2.3em 0 #fff,
+    2.3em 2.4em 0 #fff;
 }
 
-.die.three:after { 
-  box-shadow: -2.3em -2.3em 0 #345, 2.3em  2.3em 0 #345, -2.3em -2.3em 0 #FFF, 2.3em  2.4em 0 #FFF, 0 .2em 0 #FFF;
+.die.three:after {
+  box-shadow: -2.3em -2.3em 0 #345, 2.3em 2.3em 0 #345, -2.3em -2.3em 0 #fff,
+    2.3em 2.4em 0 #fff, 0 0.2em 0 #fff;
 }
 
-.die.four:after { 
+.die.four:after {
   background: transparent;
-  box-shadow: -2.3em -2.3em 0 #345, 2.3em  2.3em 0 #345, -2.3em  2.3em 0 #345, 2.3em -2.3em 0 #345, -2.3em -2.3em 0 #FFF, 2.3em  2.4em 0 #FFF, -2.3em  2.4em 0 #FFF, 2.3em -2.3em 0 #FFF;
+  box-shadow: -2.3em -2.3em 0 #345, 2.3em 2.3em 0 #345, -2.3em 2.3em 0 #345,
+    2.3em -2.3em 0 #345, -2.3em -2.3em 0 #fff, 2.3em 2.4em 0 #fff,
+    -2.3em 2.4em 0 #fff, 2.3em -2.3em 0 #fff;
 }
 
 .die.five:after {
-  box-shadow: -2.3em -2.3em 0 #345, 2.3em  2.3em 0 #345, -2.3em  2.3em 0 #345, 2.3em -2.3em 0 #345, -2.3em -2.2em 0 #FFF, 2.3em -2.2em 0 #FFF, 2.3em  2.4em 0 #FFF, -2.3em  2.4em 0 #FFF, 0 .2em 0 #FFF;
+  box-shadow: -2.3em -2.3em 0 #345, 2.3em 2.3em 0 #345, -2.3em 2.3em 0 #345,
+    2.3em -2.3em 0 #345, -2.3em -2.2em 0 #fff, 2.3em -2.2em 0 #fff,
+    2.3em 2.4em 0 #fff, -2.3em 2.4em 0 #fff, 0 0.2em 0 #fff;
 }
 
 .die.six:after {
   background: transparent;
-  box-shadow: -2.3em -2.3em 0 #345, -2.3em 0 0 #345, -2.3em  2.3em 0 #345, 2.3em -2.3em 0 #345, 2.3em      0 0 #345, 2.3em  2.3em 0 #345, -2.3em -2.1em 0 #FFF, -2.3em   .2em 0 #FFF, -2.3em  2.4em 0 #FFF, 2.3em  2.4em 0 #FFF, 2.3em   .2em 0 #FFF, 2.3em -2.1em 0 #FFF;
+  box-shadow: -2.3em -2.3em 0 #345, -2.3em 0 0 #345, -2.3em 2.3em 0 #345,
+    2.3em -2.3em 0 #345, 2.3em 0 0 #345, 2.3em 2.3em 0 #345,
+    -2.3em -2.1em 0 #fff, -2.3em 0.2em 0 #fff, -2.3em 2.4em 0 #fff,
+    2.3em 2.4em 0 #fff, 2.3em 0.2em 0 #fff, 2.3em -2.1em 0 #fff;
 }
 
 .die {
   border-top: 1px solid #f1f1f1;
   border: 1px solid #eee;
-  width: 50px; height: 50px;
+  width: 50px;
+  height: 50px;
   border-radius: 10px;
   position: relative;
   margin: 0 10px 20px 10px;
   font-size: 6px;
   display: inline-block;
-  box-shadow: 0px 5px 0 #CCC, 0 6px 3px #444, 0 10px 5px #999;
-  background-image: linear-gradient(to top, #fefefe, #f1f1f1 80%)
+  box-shadow: 0px 5px 0 #ccc, 0 6px 3px #444, 0 10px 5px #999;
+  background-image: linear-gradient(to top, #fefefe, #f1f1f1 80%);
 }
 
 .die:after {
   content: "";
-  width: 20%; 
-  height: 20%; 
-  left: 50%; 
+  width: 20%;
+  height: 20%;
+  left: 50%;
   top: 50%;
   margin: -10%;
   background: #345;
@@ -258,11 +284,11 @@ button.undo-button.active {
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 </style>
